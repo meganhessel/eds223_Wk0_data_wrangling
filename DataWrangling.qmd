@@ -1,0 +1,104 @@
+---
+title: "Data_Wrangling"
+format: html
+editor: visual
+---
+
+## Install Packages
+
+```{r}
+packages <- c("here", "janitor", "tidyverse", "sf", "terra", "tmap", "spData", "spDataLarge", "geodata", "kableExtra", "viridisLite")
+installed_packages <- packages %in% rownames(installed.packages())
+
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages])
+}
+
+library(here)
+library(janitor)
+library(tidyverse)
+library(sf)
+library(kableExtra)
+```
+
+
+## Load Data 
+
+
+```{r}
+gdw_df <- read_csv(here("data","gdw.csv")) %>% 
+  clean_names()
+gdw_df
+
+```
+
+.
+## Data Explore 
+ 
+```{r}
+# show first and last 10 rows 
+head(gdw_df) %>% kable(gdw_df)
+tail(gdw_df) %>% kable(gdw_df)
+
+# make a nice HTML table 
+kable(gdw_df)
+
+# print the numner of rows and number of columns 
+dim(gdw_df)
+nrow(gdw_df)
+ncol(gdw_df)
+
+# print the column names 
+names(gdw_df)
+
+```
+ 
+## Index, Summarize, Subset Data 
+ 
+```{r}
+# use indexing brackets to extract the column containing country names as a vector and data frame 
+country_df <- gdw_df["country"]
+class(country_df)
+
+country_list <- c(gdw_df["country"])
+class(country_vec)
+
+country_vec <- gdw_df[["country"]]
+class(country_vec_2)
+
+# Use Group by() and summarise () to fins the number of dams by type 
+gdw_dam_type <- gdw_df %>% 
+  group_by(dam_type) %>% 
+  summarise(dam_num = n()) 
+
+# Make a subset that only contains entries for dam_type == "Dam"
+sub_dam <- subset(gdw_df, dam_type == "Dam")
+
+# Re order by ascending order of installation year 
+gdw_df <- gdw_df %>% 
+  arrange(year_dam)
+
+gdw_df <- gdw_df[order(gdw_df$year_dam), ]
+```
+
+## Data Visualization 
+
+```{r}
+# Make a bar graph of average heigh of dam/barrier in meter by country 
+gdw_country <- gdw_df %>% 
+  group_by(country) %>% 
+  summarise(avg_hgt = mean(dam_hgt_m, na.rm = TRUE))
+  
+
+ggplot(data = gdw_country, 
+       aes(country, avg_hgt))+
+  geom_col()
+
+# Scatterplot of heigh of dam/barrier versus represenattive max stoarage capacity of reservoir in mill cubic meters 
+ggplot(data = gdw_df, 
+       aes(dam_hgt_m, cap_mcm
+           )) + 
+  geom_point()
+
+```
+
